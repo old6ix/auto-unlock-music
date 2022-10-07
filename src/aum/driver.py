@@ -1,18 +1,38 @@
+from dataclasses import dataclass
+
 from selenium import webdriver
 from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.remote.file_detector import LocalFileDetector
 
+from .hub import SeleniumHub
+
+
+@dataclass(frozen=True)
+class SeleniumDriver:
+    driver: WebDriver
+    hub: SeleniumHub  # 该WebDriver对应的Hub
+
+    @property
+    def download_dir(self):
+        """下载目录"""
+        return self.hub.download_dir
+
+    @property
+    def hub_url(self):
+        """对应Hub的地址"""
+        return self.hub.url
+
 
 class WebDriverFactory:
-    hub_url: str
+    sel_hub: SeleniumHub
     headless: bool
 
-    def __init__(self, hub_url: str, headless: bool = True):
+    def __init__(self, sel_hub: SeleniumHub, headless: bool = True):
         """
-        :param hub_url: Selenium Hub地址
+        :param sel_hub: Selenium Hub
         :param headless: 是否以无头模式启动
         """
-        self.hub_url = hub_url
+        self.sel_hub = sel_hub
         self.headless = headless
 
     def _generate_opts(self) -> webdriver.FirefoxOptions:
@@ -24,14 +44,17 @@ class WebDriverFactory:
         opts.headless = self.headless
         return opts
 
-    def create(self) -> WebDriver:
+    def create(self) -> SeleniumDriver:
         """创建Firefox WebDriver"""
         _driver = webdriver.Remote(
-            command_executor=self.hub_url,
+            command_executor=self.sel_hub.url,
             options=self._generate_opts()
         )
 
         # 允许向Web App上传文件
         _driver.file_detector = LocalFileDetector()
 
-        return _driver
+        return SeleniumDriver(
+            driver=_driver,
+            hub=self.sel_hub
+        )
