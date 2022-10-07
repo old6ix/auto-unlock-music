@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as expected_cond
 from selenium.webdriver.support.wait import WebDriverWait
 
 from aum.driver import SeleniumDriver
+from aum.local.dir_filter import filter_dir_by_stems, filter_dir_by_suffixes
 
 
 class UnlockMusicBroker:
@@ -47,16 +48,17 @@ class UnlockMusicBroker:
 
         :param files: 待上传的文件路径迭代器
         """
-        files -= self.locking_files  # 移除重复上传的音频文件
+        file_set = set(files)  # 待上传文件集合
+        file_set -= self.locking_files  # 移除重复上传的音频文件
 
         input_field = self.wait.until(
             expected_cond.presence_of_element_located((By.CLASS_NAME, 'el-upload__input'))
         )
-        files_str = (str(i) for i in files)  # 文件路径转字符串
-        input_field.send_keys('\n'.join(files_str))
+        filepath_str = (str(i) for i in file_set)  # 文件路径转字符串
+        input_field.send_keys('\n'.join(filepath_str))
         logging.info('正在上传...')
 
-        self.locking_files |= {i for i in files}
+        self.locking_files |= {i for i in file_set}
 
     def wait_until_unlocked(self, poll_interval: int = 1):
         """等待所有上传的文件解锁完成
@@ -98,12 +100,14 @@ class UnlockMusicBroker:
         # 等待下载完成后返回
         unlocked_files = set()
         while len(downloading_stems) > 0:  # 当下载未完成全部时
-            for child in self.download_dir.iterdir():
-                if child.stem in downloading_stems and child.suffix in self.unlocked_suffixes:  # 如果解锁文件出现
-                    unlocked_files.add(child)
-                    downloading_stems.remove(child.stem)
+            valid_stem_file_filter = filter_dir_by_stems(self.download_dir.iterdir(), downloading_stems)
+            valid_file_filter = filter_dir_by_suffixes(valid_stem_file_filter, self.unlocked_suffixes)
 
-            file_left = len(downloading_stems)
+            for new_unlocked_file in valid_file_filter:  # 如果本次解锁的文件出现
+                unlocked_files.add(new_unlocked_file)
+                downloading_stems.remove(new_unlocked_file.stem)
+
+            file_left = len(downloading_stems)  # 剩余正在下载文件的总数
             if file_left > 0:  # 未全部下载完，等待后再检查
                 logging.info(f'剩余{file_left}首...')
                 time.sleep(poll_interval)
@@ -172,7 +176,9 @@ class MusicUnlocker:
         downloaded_filename_set = broker.save_all()
 
         # 将解锁后的音乐从浏览器下载目录移动至音乐目录
+        logging.debug('将解锁后的音乐从下载目录移动至音乐目录...')
         self._move_down_to_music(downloaded_filename_set)
+        logging.debug('移动完成。')
 
     def _move_down_to_music(self, filename_set: set[str]):
         """将浏览器下载路径的音乐移动到
