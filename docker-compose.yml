@@ -1,0 +1,28 @@
+version: "3"
+
+volumes:
+  browser_download: # selenium-server下载位置
+
+services:
+  main: # 本程序
+    build: ./src
+    volumes:
+      - ${AUM_MUSIC_DIR}:/music
+      - browser_download:/browser_download
+    depends_on:
+      - unlock-music
+      - selenium-server
+
+  selenium-server: # Selenium服务
+    image: seleniarm/standalone-firefox:105.0-20221001
+    entrypoint: bash -c 'sudo chown -R seluser:seluser /home/seluser/Downloads && /opt/bin/entry_point.sh'
+    volumes:
+      - browser_download:/home/seluser/Downloads
+    shm_size: '1gb'
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+  unlock-music: # 解锁音乐的应用
+    image: ix64/unlock-music:v1.10.0
