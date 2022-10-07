@@ -1,4 +1,5 @@
 import logging
+import shutil
 
 from aum.config import ConfigFactory
 from aum.driver import WebDriverFactory, SeleniumHub
@@ -45,16 +46,32 @@ def unlock_all_music(config):
         p.unlink(missing_ok=True)
 
 
-def rename_all_music():
-    pass
+def rename_all_music(config):
+    logging.info(f'正在移除文件名内的无用子串...')
+
+    music_dir = config.music_dir
+    count = 0
+    for child in music_dir.iterdir():
+        for substr in config.removing_substr:
+            if child.stem.find(substr) != -1:
+                new_name = child.stem.replace(substr, '') + child.suffix  # 从stem中移除子串，得到新文件名
+                shutil.move(child, music_dir / new_name)
+
+                count += 1
+                logging.info(f'{count}. "{child.name}" -> "{new_name}"')
+                break
+
+    if count > 0:
+        logging.info('移除完成。')
+    else:
+        logging.info('没有文件需要移除。')
 
 
 def main():
     config = ConfigFactory().create()
 
     unlock_all_music(config)
-
-    # TODO 删除无用文件名子串
+    rename_all_music(config)
 
 
 if __name__ == '__main__':
