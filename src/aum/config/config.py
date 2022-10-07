@@ -54,7 +54,7 @@ class ConfigFactory:
 
 @dataclass(eq=False, frozen=True)
 class Config:
-    sel_hub: str = None  # selenium hub url
+    sel_hub_url: str = None  # selenium hub url
 
     unlock_music_server: str = None  # 音乐解锁服务的地址
 
@@ -67,7 +67,7 @@ class Config:
 
     def __post_init__(self):
         """在日志中输出配置"""
-        log_depends_bool('Selenium Hub', self.sel_hub)
+        log_depends_bool('Selenium Hub', self.sel_hub_url)
         log_depends_bool('Unlock Music服务地址', self.unlock_music_server)
 
         log_depends_bool('音乐目录', self.music_dir)
@@ -81,7 +81,7 @@ class Config:
     def from_env(cls) -> 'Config':
         properties = {}
         try:
-            properties = {'sel_hub': EnvValue('AUM_SELENIUM_HUB', None).raw(),
+            properties = {'sel_hub_url': EnvValue('AUM_SELENIUM_HUB', None).raw(),
                           'unlock_music_server': EnvValue('AUM_UNLOCK_SERVER', None).raw(),
                           'music_dir': EnvValue('AUM_MUSIC_DIR').to_path(),
                           'download_dir': EnvValue('AUM_DOWNLOAD_DIR').to_path(),
@@ -100,7 +100,7 @@ class Config:
 
 @dataclass(eq=False, frozen=True)
 class DevelopmentConfig(Config):
-    sel_hub: str = 'http://127.0.0.1:4444/wd/hub'
+    sel_hub_url: str = 'http://127.0.0.1:4444/wd/hub'
     unlock_music_server: str = 'https://demo.unlock-music.dev/'
 
 
