@@ -22,6 +22,9 @@ class SeleniumDriver:
         """对应Hub的地址"""
         return self.hub.url
 
+    def quit(self):
+        return self.driver.quit()
+
 
 class WebDriverFactory:
     sel_hub: SeleniumHub
