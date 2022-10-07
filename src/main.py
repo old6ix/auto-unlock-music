@@ -1,5 +1,8 @@
+from aum.config import ConfigFactory
+
+
 def main():
-    print('Hello world!')
+    config = ConfigFactory().create()
 
 
 if __name__ == '__main__':
