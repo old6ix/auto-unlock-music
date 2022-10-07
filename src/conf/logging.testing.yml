@@ -1,0 +1,23 @@
+version: 1
+
+formatters:
+  precise:
+    format: '%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: precise
+    stream: ext://sys.stdout
+  file:
+    class: logging.handlers.RotatingFileHandler
+    formatter: precise
+    filename: logs/AUM.log
+    maxBytes: 10240
+    backupCount: 3
+    encoding: utf-8
+
+loggers:
+  root:
+    level: DEBUG
+    handlers: [ console, file ]

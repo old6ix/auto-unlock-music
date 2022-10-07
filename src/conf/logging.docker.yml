@@ -1,0 +1,16 @@
+version: 1
+
+formatters:
+  docker:
+    format: '%(asctime)s [%(levelname)s] %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: docker
+    stream: ext://sys.stdout
+
+loggers:
+  root:
+    level: INFO
+    handlers: [ console ]

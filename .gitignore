@@ -1,5 +1,11 @@
 # Env file
 .env
+/src/development.env
+/src/testing.env
+/src/production.env
+
+# Log file
+*.log
 
 # Byte-compiled / optimized files
 __pycache__/
