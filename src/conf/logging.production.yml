@@ -1,0 +1,25 @@
+version: 1
+
+formatters:
+  brief:
+    format: '[%(levelname)s] %(message)s'
+  precise:
+    format: '%(asctime)s [%(levelname)s] %(message)s'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: brief
+    stream: ext://sys.stdout
+  file:
+    class: logging.handlers.RotatingFileHandler
+    formatter: precise
+    filename: logs/AUM.log
+    maxBytes: 10240
+    backupCount: 3
+    encoding: utf-8
+
+loggers:
+  root:
+    level: INFO
+    handlers: [ console, file ]
