@@ -20,7 +20,6 @@ services:
       - browser_download:/home/seluser/Downloads
     environment:
       TZ: Asia/Shanghai
-    shm_size: '1gb'
     deploy:
       resources:
         limits:
