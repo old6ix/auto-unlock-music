@@ -11,7 +11,9 @@ from selenium.webdriver.support import expected_conditions as expected_cond
 from selenium.webdriver.support.wait import WebDriverWait
 
 from aum.driver import SeleniumDriver
-from aum.local.dir_filter import filter_dir_by_stems, filter_dir_by_suffixes
+from aum.exceptions import PatchSizeError
+from aum.helpers import iter_with_patch
+from aum.helpers.dir_filter import filter_dir_by_stems, filter_dir_by_suffixes
 
 
 class UnlockMusicBroker:
@@ -174,6 +176,7 @@ class MusicUnlocker:
         broker.upload(files)
         broker.wait_until_unlocked()
         downloaded_filename_set = broker.save_all()
+        broker.clear_all()
 
         # 将解锁后的音乐从浏览器下载目录移动至音乐目录
         logging.debug('将解锁后的音乐从下载目录移动至音乐目录...')
@@ -187,3 +190,31 @@ class MusicUnlocker:
         """
         for i in filename_set:
             shutil.move(self._sel_driver.download_dir / i, self._music_dir)
+
+
+class PatchMusicUnlocker(MusicUnlocker):
+    """
+    可以分批解锁的unlocker
+    """
+
+    _patch_size: int
+
+    def __init__(self, sel_driver: SeleniumDriver, unlock_music_url: str, music_dir: pathlib.Path,
+                 unlocked_suffixes: set[str], patch_size: int = 0):
+        """
+        :param sel_driver: SeleniumDriver
+        :param unlock_music_url: 音乐解锁服务的url
+        :param music_dir: 音乐目录
+        :param unlocked_suffixes: 解锁的音频文件后缀组成的set
+        :param patch_size: 每批的音乐数量
+        """
+        super().__init__(sel_driver, unlock_music_url, music_dir, unlocked_suffixes)
+
+        if patch_size < 0:
+            logging.error(f'解锁批大小必须为非负整数（设置值：{patch_size}）！')
+            raise PatchSizeError(patch_size)
+        self._patch_size = patch_size
+
+    def unlock_files(self, files: Iterable[pathlib.Path]):
+        for path_patch in iter_with_patch(files, self._patch_size):
+            super().unlock_files(files=path_patch)
