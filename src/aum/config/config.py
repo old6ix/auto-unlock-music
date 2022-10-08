@@ -57,6 +57,7 @@ class Config:
     sel_hub_url: str = None  # selenium hub url
 
     unlock_music_server: str = None  # 音乐解锁服务的地址
+    unlock_patch_size: int = None  # 分批解锁，每批大小
 
     music_dir: pathlib.Path = None  # 音乐所在文件夹
     download_dir: pathlib.Path = None  # selenium hub下载目录
@@ -69,6 +70,13 @@ class Config:
         """在日志中输出配置"""
         log_depends_bool('Selenium Hub', self.sel_hub_url)
         log_depends_bool('Unlock Music服务地址', self.unlock_music_server)
+
+        if self.unlock_patch_size == 0:
+            logging.info('分批设置：不分批')
+        else:
+            logging.info(f'分批设置：一批最多{self.unlock_patch_size}个')
+
+        log_depends_bool('Selenium Hub下载目录', self.download_dir)
 
         log_depends_bool('音乐目录', self.music_dir)
         log_depends_bool('Selenium Hub下载目录', self.download_dir)
@@ -83,6 +91,7 @@ class Config:
         try:
             properties = {'sel_hub_url': EnvValue('AUM_SELENIUM_HUB', None).raw(),
                           'unlock_music_server': EnvValue('AUM_UNLOCK_SERVER', None).raw(),
+                          'unlock_patch_size': EnvValue('AUM_UNLOCK_PATCH_SIZE', '0').to_int(non_negative=True),
                           'music_dir': EnvValue('AUM_MUSIC_DIR').to_path(),
                           'download_dir': EnvValue('AUM_DOWNLOAD_DIR').to_path(),
                           'locked_suffixes': EnvValue('AUM_LOCKED_SUFFIXES', '').to_str_set(),

@@ -1,6 +1,7 @@
 import logging
 import os
 import pathlib
+from typing import Optional
 
 
 def log_depends_bool(info: str, value, level=logging.INFO) -> None:
@@ -19,7 +20,11 @@ def log_depends_bool(info: str, value, level=logging.INFO) -> None:
 
 
 class EnvValue:
-    def __init__(self, env_var: str, default=None):
+    def __init__(self, env_var: str, default: Optional[str] = None):
+        """
+        :param env_var: 环境变量名
+        :param default: 环境变量的默认值
+        """
         self._env_var = env_var  # 环境变量名
         self._env_value = os.environ.get(env_var, default)  # 环境变量值
 
@@ -38,6 +43,20 @@ class EnvValue:
         """
         self._check_none('字符串')
         return self._env_value
+
+    def to_int(self, non_negative: bool = False) -> int:
+        """
+        :param non_negative: 是否要求非负
+        :return: 环境变量对应的整数
+        """
+        self._check_none('数字')
+        value = int(self._env_value)
+
+        if non_negative and value < 0:
+            logging.error(f'环境变量"{self._env_var}"必须非负！')
+            raise ValueError(f'Int value of env "{self._env_var}" must be non-negative (value: {self._env_value}).')
+
+        return value
 
     def to_path(self, warn_if_not_exists: bool = True) -> pathlib.Path:
         """将环境变量解析为路径
