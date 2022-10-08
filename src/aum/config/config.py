@@ -16,16 +16,11 @@ class ConfigFactory:
     _env: str
 
     def create(self) -> 'Config':
-        config_dict = {
-            'development': DevelopmentConfig,
-            'testing': TestingConfig,
-            'production': ProductionConfig,
-            'docker': DockerConfig
-        }
+        env_set = {'development', 'testing', 'production', 'docker'}  # AUM_ENV可选设定
 
         # 获取运行环境
         env = environ.get('AUM_ENV', 'production')
-        if env not in config_dict:
+        if env not in env_set:
             logging.warning(f'运行环境"{env}"不存在，将使用默认环境production！')
             env = 'production'
         self._env = env
@@ -39,7 +34,7 @@ class ConfigFactory:
         load_dotenv(find_dotenv(f'{env}.env'))
 
         # 创建配置并返回
-        return DevelopmentConfig.from_env()
+        return Config.from_env()
 
     def __init_logging(self):
         conf_path = pathlib.Path(f'conf/logging.{self._env}.yml')
@@ -105,24 +100,3 @@ class Config:
         properties = {k: v for k, v in properties.items() if v is not None}
 
         return cls(**properties)
-
-
-@dataclass(eq=False, frozen=True)
-class DevelopmentConfig(Config):
-    sel_hub_url: str = 'http://127.0.0.1:4444/wd/hub'
-    unlock_music_server: str = 'https://demo.unlock-music.dev/'
-
-
-@dataclass(eq=False, frozen=True)
-class TestingConfig(Config):
-    pass
-
-
-@dataclass(eq=False, frozen=True)
-class ProductionConfig(Config):
-    pass
-
-
-@dataclass(eq=False, frozen=True)
-class DockerConfig(Config):
-    pass
