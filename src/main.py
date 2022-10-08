@@ -3,8 +3,8 @@ import shutil
 
 from aum.config import ConfigFactory
 from aum.driver import WebDriverFactory, SeleniumHub
-from aum.local.dir_filter import filter_dir_by_suffixes
-from aum.unlocker import MusicUnlocker
+from aum.helpers.dir_filter import filter_dir_by_suffixes
+from aum.unlocker import PatchMusicUnlocker
 
 
 def unlock_all_music(config):
@@ -28,11 +28,12 @@ def unlock_all_music(config):
     logging.debug('创建完成。')
 
     # 解密
-    music_unlocker = MusicUnlocker(
+    music_unlocker = PatchMusicUnlocker(
         sel_driver,
         unlock_music_url=config.unlock_music_server,
         music_dir=config.music_dir,
-        unlocked_suffixes=config.unlocked_suffixes
+        unlocked_suffixes=config.unlocked_suffixes,
+        patch_size=config.unlock_patch_size
     )
     music_unlocker.unlock_files(locked_music_set)
 

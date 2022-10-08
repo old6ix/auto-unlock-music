@@ -1,1 +1,1 @@
-from .unlocker import MusicUnlocker
+from .unlocker import MusicUnlocker, PatchMusicUnlocker
