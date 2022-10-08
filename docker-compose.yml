@@ -18,6 +18,8 @@ services:
     entrypoint: bash -c 'sudo chown -R seluser:seluser /home/seluser/Downloads && /opt/bin/entry_point.sh'
     volumes:
       - browser_download:/home/seluser/Downloads
+    environment:
+      TZ: Asia/Shanghai
     shm_size: '1gb'
     deploy:
       resources:
@@ -26,3 +28,5 @@ services:
 
   unlock-music: # 解锁音乐的应用
     image: ix64/unlock-music:v1.10.0
+    environment:
+      TZ: Asia/Shanghai
