@@ -9,6 +9,8 @@ services:
     volumes:
       - ${AUM_MUSIC_DIR}:/music
       - browser_download:/browser_download
+    environment:
+      AUM_UNLOCK_PATCH_SIZE: ${AUM_UNLOCK_PATCH_SIZE-6}
     depends_on:
       - unlock-music
       - selenium-server
