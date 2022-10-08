@@ -22,6 +22,7 @@ services:
       - browser_download:/home/seluser/Downloads
     environment:
       TZ: Asia/Shanghai
+      SE_START_XVFB: false
     deploy:
       resources:
         limits:
