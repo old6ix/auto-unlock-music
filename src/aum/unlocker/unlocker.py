@@ -169,6 +169,7 @@ class MusicUnlocker:
         self._unlocked_suffixes = unlocked_suffixes.copy()
 
     def unlock_files(self, files: Iterable[pathlib.Path]):
+        # 页面上的“清除全部”按钮无法正确工作，因此每次重新加载一遍页面
         self._sel_driver.driver.get(self._service_url)
 
         # 通过broker操作浏览器解锁音频文件
