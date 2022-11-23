@@ -10,6 +10,8 @@ services:
       - ${AUM_MUSIC_DIR}:/music
       - browser_download:/browser_download
     environment:
+      AUM_MUSIC_UID: ${AUM_MUSIC_UID-0}
+      AUM_MUSIC_GID: ${AUM_MUSIC_GID-0}
       AUM_UNLOCK_PATCH_SIZE: ${AUM_UNLOCK_PATCH_SIZE-6}
     depends_on:
       - unlock-music

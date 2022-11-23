@@ -35,7 +35,7 @@ def unlock_all_music(config):
         unlocked_suffixes=config.unlocked_suffixes,
         patch_size=config.unlock_patch_size
     )
-    music_unlocker.unlock_files(locked_music_set)
+    unlocked_filename_set = music_unlocker.unlock_files(locked_music_set)
 
     # 关闭WebDriver
     logging.debug('正在关闭WebDriver...')
@@ -45,6 +45,10 @@ def unlock_all_music(config):
     # 删除解密前的文件
     for p in locked_music_set:
         p.unlink(missing_ok=True)
+
+    # 更改解锁文件的所有者
+    for i in unlocked_filename_set:
+        shutil.chown(config.music_dir / i, config.music_file_uid, config.music_file_gid)
 
 
 def rename_all_music(config):
