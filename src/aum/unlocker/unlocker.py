@@ -168,7 +168,11 @@ class MusicUnlocker:
         self._music_dir = music_dir
         self._unlocked_suffixes = unlocked_suffixes.copy()
 
-    def unlock_files(self, files: Iterable[pathlib.Path]):
+    def unlock_files(self, files: Iterable[pathlib.Path]) -> set[str]:
+        """
+        :param files: 待解锁的文件路径迭代器
+        :return: 解锁后的音频文件名组成的list
+        """
         # 页面上的“清除全部”按钮无法正确工作，因此每次重新加载一遍页面
         self._sel_driver.driver.get(self._service_url)
 
@@ -183,6 +187,7 @@ class MusicUnlocker:
         logging.debug('将解锁后的音乐从下载目录移动至音乐目录...')
         self._move_down_to_music(downloaded_filename_set)
         logging.debug('移动完成。')
+        return downloaded_filename_set
 
     def _move_down_to_music(self, filename_set: set[str]):
         """将浏览器下载路径的音乐移动到
@@ -216,6 +221,15 @@ class PatchMusicUnlocker(MusicUnlocker):
             raise PatchSizeError(patch_size)
         self._patch_size = patch_size
 
-    def unlock_files(self, files: Iterable[pathlib.Path]):
+    def unlock_files(self, files: Iterable[pathlib.Path]) -> set[str]:
+        """
+        :param files: 待解锁的文件路径迭代器
+        :return: 解锁后的音频文件名组成的list
+        """
+        unlocked_filename_set = set()
+
         for path_patch in iter_with_patch(files, self._patch_size):
-            super().unlock_files(files=path_patch)
+            filename_patch = super().unlock_files(files=path_patch)
+            unlocked_filename_set |= filename_patch
+
+        return unlocked_filename_set

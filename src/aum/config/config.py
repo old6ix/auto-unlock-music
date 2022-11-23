@@ -56,6 +56,8 @@ class Config:
 
     music_dir: pathlib.Path = None  # 音乐所在文件夹
     download_dir: pathlib.Path = None  # selenium hub下载目录
+    music_file_uid: int = None  # 音乐所属用户ID
+    music_file_gid: int = None  # 音乐所属用户组ID
 
     locked_suffixes: set[str] = field(default_factory=set)  # 待解锁的后缀
     unlocked_suffixes: set[str] = field(default_factory=set)  # 已解锁的音乐文件后缀
@@ -88,6 +90,8 @@ class Config:
                           'unlock_music_server': EnvValue('AUM_UNLOCK_SERVER', None).raw(),
                           'unlock_patch_size': EnvValue('AUM_UNLOCK_PATCH_SIZE', '0').to_int(non_negative=True),
                           'music_dir': EnvValue('AUM_MUSIC_DIR').to_path(),
+                          'music_file_uid': EnvValue('AUM_MUSIC_UID').to_int(non_negative=True),
+                          'music_file_gid': EnvValue('AUM_MUSIC_GID').to_int(non_negative=True),
                           'download_dir': EnvValue('AUM_DOWNLOAD_DIR').to_path(),
                           'locked_suffixes': EnvValue('AUM_LOCKED_SUFFIXES', '').to_str_set(),
                           'unlocked_suffixes': EnvValue('AUM_UNLOCKED_SUFFIXES', '').to_str_set(),
