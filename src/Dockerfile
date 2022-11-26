@@ -1,4 +1,4 @@
-FROM python:3.9.14-slim-bullseye
+FROM python:3.9.15-slim-bullseye
 
 # 设置时区
 ENV TZ="Asia/Shanghai"
