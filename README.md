@@ -5,8 +5,18 @@
 # Auto Unlock Music
 
 <div>
-    <img alt="Python 3.9" src="https://img.shields.io/badge/Python-3.9-blue?logo=python">
-    <img alt="Docker" src="https://img.shields.io/badge/-Docker-5c5c5c?logo=docker">
+    <a href="https://www.python.org/">
+        <img alt="Python 3.9" src="https://img.shields.io/badge/Python-3.9-blue?logo=python">
+    </a>
+    <a href="https://www.docker.com/">
+        <img alt="Docker" src="https://img.shields.io/badge/-Docker-5c5c5c?logo=docker">
+    </a>
+    <a href="https://gitmoji.dev/">
+		<img alt="Gitmoji" src="https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg">
+	</a>
+    <a href="https://www.mozilla.org/en-US/MPL/2.0/FAQ/">
+        <img alt="MPL 2.0" src="https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg?logo=mozilla">
+    </a>
 </div>
 
 </div>
