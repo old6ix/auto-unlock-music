@@ -18,7 +18,7 @@ services:
       - selenium-server
 
   selenium-server: # Selenium服务
-    image: seleniarm/standalone-firefox:105.0.1
+    image: seleniarm/standalone-firefox:109.0
     entrypoint: bash -c 'sudo chown -R seluser:seluser /home/seluser/Downloads && /opt/bin/entry_point.sh'
     volumes:
       - browser_download:/home/seluser/Downloads
