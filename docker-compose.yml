@@ -31,6 +31,6 @@ services:
           memory: 500m
 
   unlock-music: # 解锁音乐的应用
-    image: ix64/unlock-music:v1.10.0
+    image: jiabh/unlock-music:v1.10.0
     environment:
       TZ: Asia/Shanghai
