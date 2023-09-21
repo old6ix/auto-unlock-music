@@ -31,26 +31,33 @@ class UnlockMusicBroker:
     __table_ele: Optional[WebElement] = None  # 页面下部的解锁预览表格的缓存
 
     def __init__(self, sel_driver: SeleniumDriver,
+                 files: Iterable[pathlib.Path],
                  unlocked_suffixes: set[str],
                  wait_time: int = 10
                  ):
         """
         :param sel_driver: 已打开Unlock Music服务的SeleniumDriver
+        :param files: 待解锁的文件路径迭代器
         :param unlocked_suffixes: 解锁的音频文件后缀组成的set
         :param wait_time: 寻找浏览器元素的超时时间
         """
         self.driver = sel_driver.driver
         self.wait = WebDriverWait(sel_driver.driver, timeout=wait_time)
 
+        self.files = files
         self.download_dir = sel_driver.download_dir
         self.unlocked_suffixes = unlocked_suffixes.copy()
 
-    def upload(self, files: Iterable[pathlib.Path]):
-        """上传待解锁的文件
+    def set_same_filename_mode(self):
+        """设置歌曲命名格式与源文件相同"""
+        radio = self.wait.until(
+            expected_cond.presence_of_element_located((By.XPATH, '//span[contains(text(), "同源文件名")]'))
+        )
+        radio.click()
 
-        :param files: 待上传的文件路径迭代器
-        """
-        file_set = set(files)  # 待上传文件集合
+    def upload(self):
+        """上传待解锁的文件"""
+        file_set = set(self.files)  # 待上传文件集合
         file_set -= self.locking_files  # 移除重复上传的音频文件
 
         input_field = self.wait.until(
@@ -88,16 +95,8 @@ class UnlockMusicBroker:
         download_all_btn.click()
         logging.info('开始下载...')
 
-        # 选出所有下载文件预览行
-        rows = self.driver.find_elements(By.CSS_SELECTOR, 'table.el-table__body .el-table__row')
-
         # 生成并返回所有的文件名stem
-        downloading_stems = set()
-        for r in rows:
-            col2 = r.find_element(By.CLASS_NAME, 'el-table_1_column_2')
-            col3 = r.find_element(By.CLASS_NAME, 'el-table_1_column_3')
-            name = col3.text + ' - ' + col2.text
-            downloading_stems.add(name)
+        downloading_stems = {i.stem for i in self.files}
 
         # 等待下载完成后返回
         unlocked_files = set()
@@ -177,8 +176,9 @@ class MusicUnlocker:
         self._sel_driver.driver.get(self._service_url)
 
         # 通过broker操作浏览器解锁音频文件
-        broker = UnlockMusicBroker(self._sel_driver, self._unlocked_suffixes)
-        broker.upload(files)
+        broker = UnlockMusicBroker(self._sel_driver, files, unlocked_suffixes=self._unlocked_suffixes)
+        broker.set_same_filename_mode()
+        broker.upload()
         broker.wait_until_unlocked()
         downloaded_filename_set = broker.save_all()
         broker.clear_all()
