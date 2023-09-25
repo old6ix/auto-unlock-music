@@ -1,4 +1,4 @@
-FROM python:3.9.15-slim-bullseye
+FROM python:3.9.18-slim-bullseye
 
 LABEL maintainer="jiabh"
 
