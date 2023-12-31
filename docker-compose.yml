@@ -26,10 +26,6 @@ services:
       TZ: Asia/Shanghai
       LANG: C.UTF-8
       SE_START_XVFB: false
-    deploy:
-      resources:
-        limits:
-          memory: 500m
 
   unlock-music: # 解锁音乐的应用
     image: zhaosuizhi/unlock-music:v1.10.0
