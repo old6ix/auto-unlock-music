@@ -18,14 +18,14 @@ services:
       - selenium-server
 
   selenium-server: # Selenium服务
-    image: seleniarm/standalone-firefox:105.0.1
+    image: seleniarm/standalone-firefox:120.0
     entrypoint: bash -c 'sudo chown -R seluser:seluser /home/seluser/Downloads && /opt/bin/entry_point.sh'
     volumes:
       - browser_download:/home/seluser/Downloads
     environment:
       TZ: Asia/Shanghai
       LANG: C.UTF-8
-      SE_START_XVFB: false
+      START_XVFB: false
 
   unlock-music: # 解锁音乐的应用
     image: zhaosuizhi/unlock-music:v1.10.0
