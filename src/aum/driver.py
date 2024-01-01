@@ -44,14 +44,17 @@ class WebDriverFactory:
         :return: Firefox配置
         """
         opts = webdriver.FirefoxOptions()
-        opts.headless = self.headless
+        if self.headless:
+            opts.add_argument('--headless')
         return opts
 
     def create(self) -> SeleniumDriver:
         """创建Firefox WebDriver"""
+        opts = self._generate_opts()
+
         _driver = webdriver.Remote(
             command_executor=self.sel_hub.url,
-            options=self._generate_opts()
+            options=opts
         )
 
         # 允许向Web App上传文件
